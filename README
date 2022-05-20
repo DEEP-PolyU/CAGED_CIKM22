@@ -1,0 +1,21 @@
+Codes for CAGED “Contrastive Knowledge Graph Error Detection”
+
+Environment installation：
+run： pip install -r requirements.txt
+
+Train：
+python Our_TopK%_RankingList.py “train”
+
+Test：
+python Our_TopK%_RankingList.py “test”
+
+Case study:
+python casestudy.py variant=var_n
+
+hyperparameters： param.py
+models: model.py
+
+
+
+
+
