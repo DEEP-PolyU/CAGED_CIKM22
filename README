@@ -1,5 +1,3 @@
-Codes for CAGED “Contrastive Knowledge Graph Error Detection”
-
 Environment installation：
 run： pip install -r requirements.txt
 
