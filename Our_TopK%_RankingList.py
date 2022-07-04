@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 
 def OurModel(ratio, kkkk, neighbors):
     # Dataset parameters
-    data_path = params.data_dir_FB
+    data_path = params.data_dir_NELL_Triple
     params.num_neighbor = neighbors
     params.batch_size = 256
     # params.BiLSTM_input_size = 50

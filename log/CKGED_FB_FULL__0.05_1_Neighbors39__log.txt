@@ -1,0 +1,23 @@
+There are 161923 Triples with 7710 anomalies in the graph.
+There are 256 Triples in this batch.
+Epoch: 0-1, pos_loss: 0.264905, neg_loss: 0.265614, Loss: 0.998581
+There are 256 Triples in this batch.
+Epoch: 0-2, pos_loss: 0.311170, neg_loss: 0.312488, Loss: 0.997365
+There are 256 Triples in this batch.
+Epoch: 0-3, pos_loss: 0.386515, neg_loss: 0.382878, Loss: 1.007274
+There are 256 Triples in this batch.
+Epoch: 0-4, pos_loss: 0.362916, neg_loss: 0.371746, Loss: 0.982341
+There are 256 Triples in this batch.
+Epoch: 0-5, pos_loss: 0.425886, neg_loss: 0.432361, Loss: 0.987050
+There are 256 Triples in this batch.
+Epoch: 0-6, pos_loss: 0.537822, neg_loss: 0.554991, Loss: 0.965663
+There are 256 Triples in this batch.
+Epoch: 0-7, pos_loss: 0.677235, neg_loss: 0.749276, Loss: 0.856887
+There are 256 Triples in this batch.
+Epoch: 0-8, pos_loss: 1.034228, neg_loss: 1.163009, Loss: 0.843587
+There are 256 Triples in this batch.
+Epoch: 0-9, pos_loss: 1.190570, neg_loss: 1.428293, Loss: 0.772320
+There are 256 Triples in this batch.
+Epoch: 0-10, pos_loss: 1.314721, neg_loss: 1.531441, Loss: 0.844520
+There are 256 Triples in this batch.
+Epoch: 0-11, pos_loss: 1.046744, neg_loss: 1.304151, Loss: 0.842441
