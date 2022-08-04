@@ -1,5 +1,5 @@
 # Contrastive Knowledge Graph Error Detection
-Pytorch-based implementation of CAGED, and the description of the model and the results can be found in the CIKM 2022 paper: "Contrastive Knowledge Graph Error Detection"[1].
+Pytorch-based implementation of CAGED, and the description of the model and the results can be found in the paper: "Contrastive Knowledge Graph Error Detection"[1].
 
 ## Requirements
 
