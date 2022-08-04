@@ -1,5 +1,14 @@
-Environment installation：
-run： pip install -r requirements.txt
+# "Contrastive Knowledge Graph Error Detection" accepted by CIKM 2022
+
+Pytorch-based implementation of CAGED, and the description of the model and the results can be found in the paper: "Contrastive Knowledge Graph Error Detection" [1].
+
+## Requirements
+
+All the required packages can be installed by running `pip install -r requirements.txt`.
+
+## Inductive Knowledge Graph Completion
+
+To replicate the experiments from our paper [1]:
 
 Train：
 python Our_TopK%_RankingList.py “train”
