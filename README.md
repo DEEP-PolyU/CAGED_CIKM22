@@ -24,4 +24,4 @@ Case study:
 `python casestudy.py variant=var_n`
 
 
-Note that the default values for hyperparameters were listed in `param.py`, while the models are in `model.py`.
+Note that the default values of hyperparameters were listed in `param.py`, while the models are in `model.py`.
