@@ -7,7 +7,7 @@ All the required packages can be installed by running `pip install -r requiremen
 
 ## Inductive Knowledge Graph Completion
 
-To replicate the experiments from our paper [1]:
+To replicate the experiments from our paper[1]:
 
 Train：
 
