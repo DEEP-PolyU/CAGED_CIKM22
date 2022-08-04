@@ -5,7 +5,7 @@ Pytorch-based implementation of CAGED, and the description of the model and the 
 
 All the required packages can be installed by running `pip install -r requirements.txt`.
 
-## Inductive Knowledge Graph Completion
+## Knowledge Graph Error Detection
 
 To replicate the experiments from our paper[1]:
 
