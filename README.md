@@ -28,8 +28,8 @@ Case study:
 `python casestudy.py variant=var_n`
 
 
-Note that the default values of hyperparameters were listed in `param.py`, while the models are in `model.py`.
 
 
 [2] "Triple trustworthiness measurement for knowledge graph".
+
 [3] "Does william shakespeare REALLY write hamlet? knowledge representation learning with confidence".
