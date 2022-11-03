@@ -23,11 +23,6 @@ Test：
 `python Our_TopK%_RankingList.py “test”`
 
 
-Case study:
-
-`python casestudy.py variant=var_n`
-
-
 
 
 [2] "Triple trustworthiness measurement for knowledge graph".
