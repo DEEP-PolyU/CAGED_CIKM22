@@ -24,7 +24,14 @@ Test：
 
 
 
-
-[2] "Triple trustworthiness measurement for knowledge graph". Code: https://github.com/TJUNLP/TTMF
+## Acknowledgment
+This repo is built upon the following work:
+```
+[2] Triple trustworthiness measurement for knowledge graph
+https://github.com/TJUNLP/TTMF
 
 [3] "Does william shakespeare REALLY write hamlet? knowledge representation learning with confidence".
+https://github.com/GemsLab/KGist.git
+```
+
+
