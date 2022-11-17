@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import random
 from random import shuffle
-import params
 
 def toarray(x):
     return torch.from_numpy(np.array(list(x)).astype(np.int32))
@@ -47,11 +46,16 @@ def get_triple_neighbor(h, r, t, dataset, num_neighbor):
     # hrt_neighbor = get_neighbor_id(h, h2t, t2h, A) + get_neighbor_id(t, h2t, t2h, A)
     # while (h, r, t) in hrt_neighbor:
     #     hrt_neighbor.remove((h, r, t))
-
+    # if len(head_neighbor) == 0:
+    #     temp = [(h, r, t)]
+    #     hh_neighbors = random.choices(temp, k=num_neighbor)
     if len(head_neighbor) > num_neighbor:
         hh_neighbors = random.sample(head_neighbor, k=num_neighbor)
-    else:
+    elif len(head_neighbor) > 0:
         hh_neighbors = random.choices(head_neighbor, k=num_neighbor)
+    else:
+        temp = [(h, r, t)]
+        hh_neighbors = random.choices(temp, k=num_neighbor)
 
     if len(tail_neighbor) > num_neighbor:
         tt_neighbors = random.sample(tail_neighbor, k=num_neighbor)
@@ -73,7 +77,7 @@ def get_triple_neighbor(h, r, t, dataset, num_neighbor):
     return hrt_neighbor
 
 
-def get_triple_batch(dataset, batch_size, num_neighbor):
+def get_triple_batch(args, dataset, batch_size, num_neighbor):
     h, r, t, all_triples, labels, A = dataset.next_batch()
     labels = labels.unsqueeze(1)
     all_triples_labels = torch.cat((all_triples, labels), dim=1)
@@ -102,7 +106,7 @@ def get_triple_batch(dataset, batch_size, num_neighbor):
     batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
     batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
 
-    batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
+    batch_triples_emb = batch_triples_emb.view(-1, 3, args.BiLSTM_input_size)
     print('input_batch.shape:', batch_triples_emb.shape)
 
     return batch_triples_emb, toarray(batch_triples), toarray(batch_labels)
@@ -161,7 +165,7 @@ def get_triple_pair(dataset, batch_size, num_neighbor):
     return batch_triples_emb, toarray(batch_triples), toarray(batch_labels)
 
 
-def get_pair_batch_train(dataset, batch_size, num_neighbor):
+def get_pair_batch_train(args, dataset, batch_size, num_neighbor):
     all_triples = dataset.train_data
     # all_triples_labels = torch.cat((all_triples, labels), dim=1)
     # print('all_triples_labels.shape', all_triples_labels.shape)
@@ -194,7 +198,7 @@ def get_pair_batch_train(dataset, batch_size, num_neighbor):
     batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
     batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
 
-    batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
+    batch_triples_emb = batch_triples_emb.view(-1, 3, args.BiLSTM_input_size)
     # print('input_batch.shape:', batch_triples_emb.shape)
 
     return batch_triples_emb, toarray(batch_triples)
@@ -231,7 +235,7 @@ def get_pair_batch_train(dataset, batch_size, num_neighbor):
 #     ent_vec, rel_vec = dataset.ent_vec, dataset.rel_vec
 #     # print("ent_vec.size", toarray(ent_vec).shape)
 #     # print("rel_vec.shape", toarray(rel_vec).shape)
-#     # assert ent_vec.size()[1] == params.BiLSTM_input_size, 'dimension of the input is not correct!'
+#     # assert ent_vec.size()[1] == args.BiLSTM_input_size, 'dimension of the input is not correct!'
 #     head_embedding = np.array([ent_vec[batch_triples[i][0]] for i in range(len(batch_triples))])
 #     head_embedding = torch.from_numpy(head_embedding)
 #
@@ -244,21 +248,21 @@ def get_pair_batch_train(dataset, batch_size, num_neighbor):
 #     batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
 #     batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
 #
-#     batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
+#     batch_triples_emb = batch_triples_emb.view(-1, 3, args.BiLSTM_input_size)
 #     # print('input_batch.shape:', batch_triples_emb.shape)
 #
 #     return batch_triples_emb, toarray(batch_triples), toarray(batch_labels), start_id, length
 
 
-def get_batch_baseline(all_triples, train_idx, n_batch):
+def get_batch_baseline(args, all_triples, train_idx, n_batch):
 
     if n_batch == 0:
         np.random.shuffle(train_idx)
-    if (n_batch + 1) * params.batch_size > len(train_idx):
-        ids = train_idx[n_batch * params.batch_size:]
-        # length = len(train_idx) - n_batch * params.batch_size
+    if (n_batch + 1) * args.batch_size > len(train_idx):
+        ids = train_idx[n_batch * args.batch_size:]
+        # length = len(train_idx) - n_batch * args.batch_size
     else:
-        ids = train_idx[n_batch * params.batch_size: (n_batch + 1) * params.batch_size]
+        ids = train_idx[n_batch * args.batch_size: (n_batch + 1) * args.batch_size]
 
     # train_pos = all_triples[0:len(all_triples) // 2, :]
     # train_neg = all_triples[len(all_triples) // 2:, :]
@@ -270,21 +274,21 @@ def get_batch_baseline(all_triples, train_idx, n_batch):
     batch_t = np.append(np.array([all_triples[i][2] for i in ids]),
                         np.array([all_triples[i + len(all_triples) // 2][2] for i in ids]))
 
-    batch_y = np.concatenate((np.ones(params.batch_size), -1 * np.ones(params.batch_size)))
+    batch_y = np.concatenate((np.ones(args.batch_size), -1 * np.ones(args.batch_size)))
 
     return batch_h, batch_t, batch_r, batch_y
 # return toarray(batch_h), toarray(batch_t), toarray(batch_r), toarray(batch_y)
 
 
-def get_batch_baseline_test(all_triples, labels, train_idx, n_batch):
+def get_batch_baseline_test(args, all_triples, labels, train_idx, n_batch):
     if n_batch == 0:
         np.random.shuffle(train_idx)
-    if (n_batch + 1) * params.batch_size > len(train_idx):
-        ids = train_idx[n_batch * params.batch_size:]
-        # length = len(train_idx) - n_batch * params.batch_size
+    if (n_batch + 1) * args.batch_size > len(train_idx):
+        ids = train_idx[n_batch * args.batch_size:]
+        # length = len(train_idx) - n_batch * args.batch_size
     else:
-        ids = train_idx[n_batch * params.batch_size: (n_batch + 1) * params.batch_size]
-    # ids = train_idx[n_batch * params.batch_size: (n_batch + 1) * params.batch_size]
+        ids = train_idx[n_batch * args.batch_size: (n_batch + 1) * args.batch_size]
+    # ids = train_idx[n_batch * args.batch_size: (n_batch + 1) * args.batch_size]
 
     batch_h = np.append(np.array([all_triples[i][0] for i in ids]),
                         np.array([all_triples[i + len(all_triples) // 2][0] for i in ids]))
@@ -293,13 +297,13 @@ def get_batch_baseline_test(all_triples, labels, train_idx, n_batch):
     batch_t = np.append(np.array([all_triples[i][2] for i in ids]),
                         np.array([all_triples[i + len(all_triples) // 2][2] for i in ids]))
 
-    batch_y = np.concatenate((np.ones(params.batch_size), -1 * np.ones(params.batch_size)))
+    batch_y = np.concatenate((np.ones(args.batch_size), -1 * np.ones(args.batch_size)))
     label = np.array([labels[i] for i in ids])
 
     return batch_h, batch_t, batch_r, batch_y, label
 
 
-def get_pair_batch_train_common(dataset, n_batch, train_idx, batch_size, num_neighbor):
+def get_pair_batch_train_common(args, dataset, n_batch, train_idx, batch_size, num_neighbor):
     all_triples = dataset.train_data
     # all_triples_labels = torch.cat((all_triples, labels), dim=1)
     # print('all_triples_labels.shape', all_triples_labels.shape)
@@ -332,29 +336,7 @@ def get_pair_batch_train_common(dataset, n_batch, train_idx, batch_size, num_nei
     batch_t = np.array([batch_triples[i][2] for i in range(len(batch_triples))])
 
     return batch_h, batch_r, batch_t, length
-    #     print("hrt_neighbor111:", len(hrt_neighbor))
-    # print("num of batch_triples", len(batch_triples))
-    # print("shape of batchtriples", batch_triples.shape())
 
-    # print('batch_triples', batch_triples)
-    # ent_vec, rel_vec = dataset.ent_vec, dataset.rel_vec
-    #
-    # head_embedding = np.array([ent_vec[batch_triples[i][0]] for i in range(len(batch_triples))])
-    # head_embedding = torch.from_numpy(head_embedding)
-    #
-    # relation_embedding = np.array([rel_vec[batch_triples[i][1]] for i in range(len(batch_triples))])
-    # relation_embedding = torch.from_numpy(relation_embedding)
-    #
-    # tail_embedding = np.array([ent_vec[batch_triples[i][2]] for i in range(len(batch_triples))])
-    # tail_embedding = torch.from_numpy(tail_embedding)
-    #
-    # batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
-    # batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
-    #
-    # batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
-    # # print('input_batch.shape:', batch_triples_emb.shape)
-    #
-    # return batch_triples_emb, toarray(batch_triples), length
 
 
 def get_pair_batch_test(dataset, batch_size, num_neighbor, start_id):
@@ -402,7 +384,7 @@ def get_pair_batch_test(dataset, batch_size, num_neighbor, start_id):
     # batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
     # batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
     #
-    # batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
+    # batch_triples_emb = batch_triples_emb.view(-1, 3, args.BiLSTM_input_size)
     # # print('input_batch.shape:', batch_triples_emb.shape)
     #
     # return batch_triples_emb, toarray(batch_triples), toarray(batch_labels), start_id, length
@@ -452,7 +434,7 @@ def get_pair_batch_test(dataset, batch_size, num_neighbor, start_id):
 #     batch_triples_emb = torch.cat((head_embedding, relation_embedding), dim=1)
 #     batch_triples_emb = torch.cat((batch_triples_emb, tail_embedding), dim=1)
 #
-#     batch_triples_emb = batch_triples_emb.view(-1, 3, params.BiLSTM_input_size)
+#     batch_triples_emb = batch_triples_emb.view(-1, 3, args.BiLSTM_input_size)
 #     # print('input_batch.shape:', batch_triples_emb.shape)
 #
 #     return batch_triples_emb, toarray(batch_triples), length

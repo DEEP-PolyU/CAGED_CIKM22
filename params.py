@@ -3,17 +3,17 @@ import torch
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-
-data_dir_FB = "./data/FB15k-237"
-data_dir_WN = "./data/WN18RR"
-data_dir_umls = "./data/umls"
-data_dir_kinship = "./data/kinship"
-data_dir_NELL_Triple = "./data/NELL-995"
-data_dir_NELL = "./data/NELL"
-data_dir_YAGO = "./data/YAGO3-10"
-data_dir_FB5M = "./data/FB5M"
-data_dir_FB2M = "./data/FB2M"
-data_dir_DBPEDIA = "./data/DBPEDIA"
+DATASET_LIST = ['csqa', 'obqa', 'socialiqa', 'medqa_usmle']
+data_dir_FB = "data/FB15k-237"
+data_dir_WN = "data/WN18RR"
+data_dir_umls = "data/umls"
+data_dir_kinship = "data/kinship"
+data_dir_NELL_Triple = "data/NELL-995"
+data_dir_NELL = "data/NELL"
+data_dir_YAGO = "data/YAGO3-10"
+data_dir_FB5M = "data/FB5M"
+data_dir_FB2M = "data/FB2M"
+data_dir_DBPEDIA = "data/DBPEDIA"
 
 
 dir_emb_ent = "entity2vec.txt"
@@ -58,6 +58,7 @@ anomaly_ratio = 0.01
 total_ent = 0
 total_rel = 0
 embedding_dim = 100
+
 margin = 1.0
 p_norm = 2
 lr = 0.01

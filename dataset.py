@@ -2,13 +2,11 @@ import numpy as np
 import random
 import torch
 import math
-import params
 from random import shuffle
 
 
 class Reader:
-    def __init__(self, path, isInjectTopK):
-        self.isInjectTopK = isInjectTopK
+    def __init__(self, args, path):
 
         self.ent2id = dict()
         self.rel2id = dict()
@@ -23,18 +21,11 @@ class Reader:
         self.path = path
 
         self.A = {}
-        # self.ent_vec, self.rel_vec = self.init_embeddings(path + '/' + params.dir_emb_ent,
-        #                                                   self.path + '/' + params.dir_emb_rel)
-        # self.num_entity = len(self.ent_vec)
-        # self.num_relation = len(self.rel_vec)
-        # self.A = np.ones((len(self.ent_vec), len(self.ent_vec)))
-        # self.A = -1 * self.A
-        # self.A = self.A.astype(np.int32)
-        # print('A.size', self.A.shape, self.A[100][100])
-        if self.path == params.data_dir_YAGO or self.path == params.data_dir_NELL or self.path == params.data_dir_DBPEDIA:
-            self.read_triples_yago3()
-        else:
-            self.read_triples()
+        self.read_triples()
+        # if self.path == args.data_dir_YAGO or self.path == args.data_dir_NELL or self.path == args.data_dir_DBPEDIA:
+        #     self.read_triples_yago3()
+        # else:
+        #     self.read_triples()
         self.triple_ori_set = set(self.triples)
         self.num_original_triples = len(self.triples)
 
@@ -42,7 +33,7 @@ class Reader:
         self.num_relation = self.num_rel()
         print('entity&relation: ', self.num_entity, self.num_relation)
 
-        self.bp_triples_label = self.inject_anomaly()
+        self.bp_triples_label = self.inject_anomaly(args)
 
         self.num_triples_with_anomalies = len(self.bp_triples_label)
         self.train_data, self.labels = self.get_data()
@@ -286,18 +277,19 @@ class Reader:
     def toarray(self, x):
         return torch.from_numpy(np.array(list(x)).astype(np.int32))
 
-    def inject_anomaly(self):
+    def inject_anomaly(self, args):
         print("Inject anomalies!")
         original_triples = self.triples
         triple_size = len(original_triples)
 
-        if self.isInjectTopK:
-            self.num_anomalies = params.num_anomaly_num
-            print("###########Inject TOP@K Anomalies##########")
-        else:
-            self.num_anomalies = int(params.anomaly_ratio * self.num_original_triples)
-            params.num_anomaly_num = self.num_anomalies
-            print("###########Inject TOP@K% Anomalies##########")
+        self.num_anomalies = int(args.anomaly_ratio * self.num_original_triples)
+        args.num_anomaly_num = self.num_anomalies
+        print("###########Inject TOP@K% Anomalies##########")
+        # if self.isInjectTopK:
+        #     self.num_anomalies = args.num_anomaly_num
+        #     print("###########Inject TOP@K Anomalies##########")
+        # else:
+        #
 
         # idx = random.sample(range(0, self.num_original_triples - 1), num_anomalies)
         idx = random.sample(range(0, self.num_original_triples - 1), self.num_anomalies // 2)
@@ -312,7 +304,7 @@ class Reader:
         return triple_anomaly_label
 
 #
-# dataset = Reader(params.data_dir_FB, "train")
+# dataset = Reader(args.data_dir_FB, "train")
 # xxx = dataset.inject_anomaly()
 # # print(xxx[0][1])
 # # print(xxx[0][0])
