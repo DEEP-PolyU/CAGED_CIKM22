@@ -189,8 +189,8 @@ def test(args, dataset, device):
     logger.addHandler(file_handler)
     logging.info('There are %d Triples with %d anomalies in the graph.' % (len(dataset.labels), total_num_anomalies))
 
-    # args.total_ent = dataset.num_entity
-    # args.total_rel = dataset.num_relation
+    args.total_ent = dataset.num_entity
+    args.total_rel = dataset.num_relation
 
     model_saved_path = model_name + "_" + args.dataset + "_" + str(args.anomaly_ratio) + ".ckpt"
     model_saved_path = os.path.join(args.save_dir, model_saved_path)
@@ -246,8 +246,12 @@ def test(args, dataset, device):
 
         max_top_k = total_num_anomalies * 2
         min_top_k = total_num_anomalies // 10
+        # all_loss = torch.from_numpy(np.array(list(all_loss.to(torch.device("cpu"))).astype(np.float))
 
-        top_loss, top_indices = torch.topk(toarray_float(all_loss), max_top_k, largest=True, sorted=True)
+        all_loss = np.array(all_loss)
+        all_loss = torch.from_numpy(all_loss)
+
+        top_loss, top_indices = torch.topk(all_loss, max_top_k, largest=True, sorted=True)
         top_labels = toarray([all_label[top_indices[iii]] for iii in range(len(top_indices))])
 
         anomaly_discovered = []
@@ -292,5 +296,5 @@ def test(args, dataset, device):
             logging.info('[Train][%s][%s] anomalies in total: %d -- discovered:%d -- K : %d' % (
                 args.dataset, model_name, total_num_anomalies, anomaly_discovered[num_k - 1], num_k))
 
-
-main()
+if __name__ == '__main__':
+    main()
