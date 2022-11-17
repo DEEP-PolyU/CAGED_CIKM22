@@ -5,8 +5,6 @@ from torch.nn import functional as F
 import numpy as np
 import logging
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 class GraphAttentionLayer1(nn.Module):
     """
     Simple GAT layer, similar to https://arxiv.org/abs/1710.10903
@@ -60,7 +58,7 @@ class GraphAttentionLayer1(nn.Module):
 
 
 class BiLSTM_Attention(torch.nn.Module):
-    def __init__(self, args, input_size, hidden_size, num_layers, dropout, alpha):
+    def __init__(self, args, input_size, hidden_size, num_layers, dropout, alpha, device):
         super(BiLSTM_Attention, self).__init__()
         # self.ent_embeddings = nn.Embedding(args.total_ent + 1, args.embedding_dim)
         # self.rel_embeddings = nn.Embedding(args.total_rel + 1, args.embedding_dim)
@@ -72,7 +70,7 @@ class BiLSTM_Attention(torch.nn.Module):
         self.num_neighbor = args.num_neighbor
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
         #self.fc = nn.Linear(hidden_size * 2 * self.seq_length, num_classes)  # 2 for bidirection
-
+        self.device = device
         self.attention = GraphAttentionLayer1(self.hidden_size * 2 * self.seq_length, self.hidden_size * 2 * self.seq_length, dropout=dropout, alpha=alpha, concat=False)
         # self.attentions = [GraphAttentionLayer(self.hidden_size * 2 * self.seq_length, self.hidden_size * 2 * self.seq_length, dropout=dropout, alpha=alpha, concat=False) for _ in
         #                    range(nheads)]
@@ -125,8 +123,8 @@ class BiLSTM_Attention(torch.nn.Module):
         # [B, 3, input_size] B = batch_size * 2 * 2 * (num_neighbor+1)
         # x = x.to(device)
 
-        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(device)# 2 for bidirection
-        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(device)
+        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(self.device)# 2 for bidirection
+        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(self.device)
 
         # Forward propagate LSTM
         out, _ = self.lstm(x, (h0, c0))  # out: tensor of shape (B, seq_length, hidden_size*2)

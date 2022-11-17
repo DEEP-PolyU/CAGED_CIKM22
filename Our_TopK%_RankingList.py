@@ -21,7 +21,7 @@ def main():
     # args, _ = parser.parse_known_args()
     parser.add_argument('--model', default='CAGED', help='model name')
     parser.add_argument('--seed', default=0, type=int, help='random seed')
-    parser.add_argument('--mode', default='train', choices=['train', 'test'], help='run training or evaluation')
+    parser.add_argument('--mode', default='test', choices=['train', 'test'], help='run training or evaluation')
     parser.add_argument('-ds', '--dataset', default='WN18RR', help='dataset')
     args, _ = parser.parse_known_args()
     parser.add_argument('--save_dir', default=f'./checkpoints/{args.dataset}/', help='model output directory')
@@ -103,10 +103,8 @@ def train(args, dataset, device):
     model_saved_path = os.path.join(args.save_dir, model_saved_path)
     # model.load_state_dict(torch.load(model_saved_path))
     # Model BiLSTM_Attention
-    print("AAAAAAAAAA")
     model = BiLSTM_Attention(args, args.BiLSTM_input_size, args.BiLSTM_hidden_size, args.BiLSTM_num_layers, args.dropout,
-                             args.alpha).to(device)
-    print("BBBBBBBB")
+                             args.alpha, device).to(device)
     criterion = nn.MarginRankingLoss(args.gama)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     #
@@ -117,7 +115,7 @@ def train(args, dataset, device):
                                                                                 args.batch_size,
                                                                                 args.num_neighbor)
             # end_read_time = time.time()
-            print("Time used in loading data", it)
+            # print("Time used in loading data", it)
 
             batch_h = torch.LongTensor(batch_h).to(device)
             batch_t = torch.LongTensor(batch_t).to(device)
@@ -168,6 +166,7 @@ def train(args, dataset, device):
             # print("BP time:", math.fabs(final_time - running_time))
 
             torch.save(model.state_dict(), model_saved_path)
+    print("The training ends!")
     # # #
     # dataset = Reader(data_path, "test")
 
@@ -176,6 +175,7 @@ def train(args, dataset, device):
 def test(args, dataset, device):
     # Dataset parameters
     # data_name = args.dataset
+    device = torch.device('cpu')
     data_path = args.data_path
     model_name = args.model
     all_triples = dataset.train_data
@@ -196,7 +196,7 @@ def test(args, dataset, device):
     model_saved_path = os.path.join(args.save_dir, model_saved_path)
 
     model1 = BiLSTM_Attention(args, args.BiLSTM_input_size, args.BiLSTM_hidden_size, args.BiLSTM_num_layers, args.dropout,
-                              args.alpha).to(device)
+                              args.alpha, device).to(device)
     model1.load_state_dict(torch.load(model_saved_path))
     model1.eval()
     with torch.no_grad():
@@ -233,7 +233,7 @@ def test(args, dataset, device):
             all_label += labels
 
             # print('{}th test data'.format(i))
-            logging.info('[Train] Evaluation on %d batch of Original graph' % i)
+            logging.info('[Test] Evaluation on %d batch of Original graph' % i)
             # sum = labels.sum()
             # if sum < labels.size(0):
             #     # loss = -1 * loss
@@ -274,10 +274,10 @@ def test(args, dataset, device):
 
         precision_interval_10 = [precision_k[i * 10] for i in range(max_top_k // 10)]
         # print(precision_interval_10)
-        logging.info('[Train] final Precision: %s' % str(precision_interval_10))
+        logging.info('[Test] final Precision: %s' % str(precision_interval_10))
         recall_interval_10 = [recall_k[i * 10] for i in range(max_top_k // 10)]
         # print(recall_interval_10)
-        logging.info('[Train] final Recall: %s' % str(recall_interval_10))
+        logging.info('[Test] final Recall: %s' % str(recall_interval_10))
 
         logging.info('K = %d' % args.max_epoch)
         ratios = [0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.20, 0.30, 0.45]
@@ -291,9 +291,9 @@ def test(args, dataset, device):
             precision = anomaly_discovered[num_k - 1] * 1.0 / num_k
 
             logging.info(
-                '[Train][%s][%s] Precision %f -- %f : %f' % (args.dataset, model_name, args.anomaly_ratio, ratios[i], precision))
-            logging.info('[Train][%s][%s] Recall  %f-- %f : %f' % (args.dataset, model_name, args.anomaly_ratio, ratios[i], recall))
-            logging.info('[Train][%s][%s] anomalies in total: %d -- discovered:%d -- K : %d' % (
+                '[Test][%s][%s] Precision %f -- %f : %f' % (args.dataset, model_name, args.anomaly_ratio, ratios[i], precision))
+            logging.info('[Test][%s][%s] Recall  %f-- %f : %f' % (args.dataset, model_name, args.anomaly_ratio, ratios[i], recall))
+            logging.info('[Test][%s][%s] anomalies in total: %d -- discovered:%d -- K : %d' % (
                 args.dataset, model_name, total_num_anomalies, anomaly_discovered[num_k - 1], num_k))
 
 if __name__ == '__main__':
