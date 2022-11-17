@@ -15,7 +15,7 @@ To replicate the experiments from our paper:
 
 Train：
 
-`python Our_TopK%_RankingList.py --dataset "WN18RR" --mode “train” --anomaly_ratio 0.05 --mu 0.001 --lam 0.1
+`python Our_TopK%_RankingList.py --dataset "WN18RR" --mode “train” --anomaly_ratio 0.05 --mu 0.001 --lam 0.1`
 
 
 Test：
