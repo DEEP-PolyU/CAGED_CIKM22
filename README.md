@@ -15,12 +15,12 @@ To replicate the experiments from our paper:
 
 Train：
 
-`python Our_TopK%_RankingList.py “train”`
+`python Our_TopK%_RankingList.py --mode “train”`
 
 
 Test：
 
-`python Our_TopK%_RankingList.py “test”`
+`python Our_TopK%_RankingList.py --mode “test”`
 
 
 
