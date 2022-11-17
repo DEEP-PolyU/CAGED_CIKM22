@@ -31,7 +31,7 @@ This repo is built upon the following work:
 https://github.com/TJUNLP/TTMF.git
 
 [2] "Does william shakespeare REALLY write hamlet? knowledge representation learning with confidence".
-https://github.com/GemsLab/KGist.git
+https://github.com/thunlp/CKRL.git
 ```
 
 
