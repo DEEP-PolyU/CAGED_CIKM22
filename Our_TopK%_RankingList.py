@@ -57,6 +57,7 @@ def main():
     parser.add_argument('--learning_rate', default=0.003, type=float, help='learning rate')
     parser.add_argument('--gama', default=0.5, type=float, help="margin parameter")
     parser.add_argument('--lam', default=0.1, type=float, help="trade-off parameter")
+    parser.add_argument('--mu', default=0.001, type=float, help="gated attention parameter")
     parser.add_argument('--anomaly_ratio', default=0.05, type=float, help="anomaly ratio")
     parser.add_argument('--num_anomaly_num', default=300, type=int, help="number of anomalies")
     args = parser.parse_args()
@@ -104,7 +105,7 @@ def train(args, dataset, device):
     # model.load_state_dict(torch.load(model_saved_path))
     # Model BiLSTM_Attention
     model = BiLSTM_Attention(args, args.BiLSTM_input_size, args.BiLSTM_hidden_size, args.BiLSTM_num_layers, args.dropout,
-                             args.alpha, device).to(device)
+                             args.alpha, args.mu, device).to(device)
     criterion = nn.MarginRankingLoss(args.gama)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     #
@@ -196,7 +197,7 @@ def test(args, dataset, device):
     model_saved_path = os.path.join(args.save_dir, model_saved_path)
 
     model1 = BiLSTM_Attention(args, args.BiLSTM_input_size, args.BiLSTM_hidden_size, args.BiLSTM_num_layers, args.dropout,
-                              args.alpha, device).to(device)
+                              args.alpha, args.mu, device).to(device)
     model1.load_state_dict(torch.load(model_saved_path))
     model1.eval()
     with torch.no_grad():

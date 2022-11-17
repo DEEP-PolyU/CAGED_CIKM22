@@ -10,13 +10,14 @@ class GraphAttentionLayer1(nn.Module):
     Simple GAT layer, similar to https://arxiv.org/abs/1710.10903
     """
 
-    def __init__(self, in_features, out_features, dropout, alpha, concat=False):
+    def __init__(self, in_features, out_features, dropout, alpha, mu=0.001, concat=False):
         super(GraphAttentionLayer1, self).__init__()
         self.in_features = in_features  
         self.out_features = out_features 
         self.dropout = dropout 
         self.alpha = alpha 
-        self.concat = concat 
+        self.concat = concat
+        self.mu = mu
 
         self.W = nn.Parameter(torch.zeros(size=(in_features, out_features)))
         nn.init.xavier_uniform_(self.W.data, gain=1.414) 
@@ -43,7 +44,7 @@ class GraphAttentionLayer1(nn.Module):
         # [batch_size, N, 1] 
 
         attention = F.softmax(e, dim=1)  # [batch_size, N, 1]
-        attention = attention - 0.001
+        attention = attention - self.mu
         attention = (attention + abs(attention)) / 2.0
         # print(attention)
         attention = F.dropout(attention, self.dropout, training=self.training)  # dropout
@@ -58,7 +59,7 @@ class GraphAttentionLayer1(nn.Module):
 
 
 class BiLSTM_Attention(torch.nn.Module):
-    def __init__(self, args, input_size, hidden_size, num_layers, dropout, alpha, device):
+    def __init__(self, args, input_size, hidden_size, num_layers, dropout, alpha, mu, device):
         super(BiLSTM_Attention, self).__init__()
         # self.ent_embeddings = nn.Embedding(args.total_ent + 1, args.embedding_dim)
         # self.rel_embeddings = nn.Embedding(args.total_rel + 1, args.embedding_dim)
@@ -71,7 +72,7 @@ class BiLSTM_Attention(torch.nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
         #self.fc = nn.Linear(hidden_size * 2 * self.seq_length, num_classes)  # 2 for bidirection
         self.device = device
-        self.attention = GraphAttentionLayer1(self.hidden_size * 2 * self.seq_length, self.hidden_size * 2 * self.seq_length, dropout=dropout, alpha=alpha, concat=False)
+        self.attention = GraphAttentionLayer1(self.hidden_size * 2 * self.seq_length, self.hidden_size * 2 * self.seq_length, dropout=dropout, alpha=alpha, mu=mu, concat=False)
         # self.attentions = [GraphAttentionLayer(self.hidden_size * 2 * self.seq_length, self.hidden_size * 2 * self.seq_length, dropout=dropout, alpha=alpha, concat=False) for _ in
         #                    range(nheads)]
         # for i, attention in enumerate(self.attentions):
