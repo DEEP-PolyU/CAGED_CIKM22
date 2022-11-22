@@ -53,7 +53,7 @@ def main():
     parser.add_argument('--dropout', type=float, default=0.2, help='dropout for EaGNN')
 
     # optimization
-    parser.add_argument('--max_epoch', default=5, help='max epochs')
+    parser.add_argument('--max_epoch', default=6, help='max epochs')
     parser.add_argument('--learning_rate', default=0.003, type=float, help='learning rate')
     parser.add_argument('--gama', default=0.5, type=float, help="margin parameter")
     parser.add_argument('--lam', default=0.1, type=float, help="trade-off parameter")
